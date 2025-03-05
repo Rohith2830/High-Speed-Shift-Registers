@@ -1,0 +1,84 @@
+module siso_shift_register (
+    input clk,
+    input rst,
+    input serial_in,
+    output reg serial_out
+);
+    reg [7:0] shift_reg; // 8-bit shift register
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            shift_reg <= 8'b0; // Reset the register
+            serial_out <= 1'b0;
+        end else begin
+            serial_out <= shift_reg[7]; // Output the MSB
+            shift_reg <= {shift_reg[6:0], serial_in}; // Shift left and input serial data
+        end
+    end
+endmodule
+
+
+
+`timescale 1ns / 1ps
+
+module tb_siso_shift_register;
+    reg clk;
+    reg rst;
+    reg serial_in;
+    wire serial_out;
+
+    // Instantiate the SISO Shift Register
+    siso_shift_register uut (
+        .clk(clk),
+        .rst(rst),
+        .serial_in(serial_in),
+        .serial_out(serial_out)
+    );
+
+    // Generate clock
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // 10ns clock period
+    end
+
+    // Test sequence
+    initial begin
+        // Initialize
+        rst = 1; serial_in = 0;
+        #10; // Wait for a few clock cycles
+        rst = 0;
+
+        // Input some serial data
+        serial_in = 1; #10; // Shift in '1'
+        serial_in = 0; #10; // Shift in '0'
+        serial_in = 1; #10; // Shift in '1'
+        serial_in = 1; #10; // Shift in '1'
+        serial_in = 0; #10; // Shift in '0'
+        serial_in = 1; #10; // Shift in '1'
+        serial_in = 0; #10; // Shift in '0'
+        serial_in = 0; #10; // Shift in '0'
+
+        // Finish the simulation
+        #100;
+        $finish;
+    end
+
+    // Monitor the outputs
+    initial begin
+        $monitor("Time: %0t | serial_out: %b | shift_reg: %b", $time, serial_out, uut.shift_reg);
+    end
+endmodule
+
+
+#  Created by Genus(TM) Synthesis Solution 21.14-s082_1 on Thu Oct 17 13:30:50 IST 2024
+
+set sdc_version 2.0
+
+set_units -capacitance 1000fF
+set_units -time 1000ps
+
+# Set the current design
+current_design siso_shift_register
+
+set_clock_gating_check -setup 0.0 
+set_wire_load_mode "enclosed"
