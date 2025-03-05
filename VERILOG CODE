@@ -1,0 +1,52 @@
+// Code your design here
+module siso_shift_register (
+    input logic clk,        // Clock input
+    input logic reset,      // Reset input
+    input logic serial_in,  // Serial input bit
+    output logic serial_out // Serial output bit
+);
+    logic [3:0] shift_reg;
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            shift_reg <= 4'b0000; // Reset the shift register
+        end else begin
+            shift_reg <= {shift_reg[2:0], serial_in}; // Shift left and insert serial_in at LSB
+        end
+    end
+    assign serial_out = shift_reg[3];
+endmodule
+//Textbench code
+module tb_siso_shift_register;
+    logic clk;
+    logic reset;
+    logic serial_in;
+    logic serial_out;
+    siso_shift_register uut (
+        .clk(clk),
+        .reset(reset),
+        .serial_in(serial_in),
+        .serial_out(serial_out)
+    );
+    always #5 clk = ~clk; 
+    initial begin
+        clk = 0;
+        reset = 0;
+        serial_in = 0;
+        $dumpfile("siso_waveform.vcd"); // Output file for waveform data
+        $dumpvars(0, tb_siso_shift_register); // Dump all variables to the VCD file
+        $display("Applying reset...");
+        reset = 1;
+        #10 reset = 0; 
+        $display("Shifting in data...");
+        serial_in = 1; #10; // Shift in '1'
+        serial_in = 0; #10; // Shift in '0'
+        serial_in = 1; #10; // Shift in '1'
+        serial_in = 1; #10; // Shift in '1'
+        #20;
+        $stop;
+    end
+    initial begin
+        $monitor("Time = %0t, Reset = %b, Serial In = %b, Serial Out = %b", 
+                 $time, reset, serial_in, serial_out);
+    end
+endmodule
