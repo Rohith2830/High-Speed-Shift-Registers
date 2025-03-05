@@ -1,0 +1,21 @@
+@genus:root: 1> read_libs /home/install/FOUNDRY/digital/90nm/dig/lib/slow.lib  @genus:root: 2> read_hdl counter.v 
+@genus:root: 3> elaborate 
+@genus:root: 4> read_sdc constraints_top.sdc 
+@genus:root: 5> gedit constraints_top.sdc 
+@genus:root: 6> read_sdc constraints_top.sdc 
+@genus:root: 7> syn_generic 
+@genus:root: 8> syn_map 
+@genus:root: 9> syn_opt 
+@genus:root: 10> report_power 
+@genus:root: 11> report_power > counter_power.repo 
+@genus:root: 12> report_power > counter_power.report 
+@genus:root: 13> report_area 
+@genus:root: 14> report_area > counter_area.report 
+@genus:root: 15> report_timing 
+@genus:root: 16> report_timing > counter_timing.report 
+@genus:root: 17> write_hdl > counter_netlist.v 
+@genus:root: 18> write_sdc > counter_sdc.sdc 
+@genus:root: 19> synthesize -to_mapped -effort medium 
+@genus:root: 20> write_hdl > counter_netlist.v 
+@genus:root: 21> write_sdc > counter_sdc.sdc 
+@genus:root: 22> gui_show
